@@ -1,17 +1,17 @@
 # Paint-Print-Station
 A paint and print station for Raspberry Pi with 3.5inch touch screen and thermal printer.
 
-# Dependance
+## Dependance
 * Pygame
 
-# Running method
+## Running method
 ```
 python paint_station.py
 ```
 
 ![Photo](doc/photo01.jpg)
 
-# Configuration
+## Configuration
 If you want to use python-escpos lib to print paints, change this line in [paint_station_config.ini](paint_station_config.ini):
 ```
 use_escpos = 1
