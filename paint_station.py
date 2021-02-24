@@ -39,29 +39,59 @@ class PaintStation():
         self._print = Print()
 
         self._last_save_filename = None
+        self._current_finger_id = None
 
     def run(self):
         try:
             while True:
-                e = pygame.event.wait()
-                if e.type == pygame.QUIT:
-                    raise StopIteration
-                if e.type == pygame.MOUSEBUTTONDOWN:
-                    for layer in reversed(self._layers):
-                        if layer.mouse_down(e.pos) == True:
-                            break
-                if e.type == pygame.MOUSEMOTION:
-                    for layer in reversed(self._layers):
-                        if layer.mouse_move(e.pos) == True:
-                            break
-                if e.type == pygame.MOUSEBUTTONUP:
-                    for layer in reversed(self._layers):
-                        if layer.mouse_up(e.pos) == True:
-                            break
-                if e.type == pygame.KEYDOWN:
-                    for layer in reversed(self._layers):
-                        if layer.key_down(e.key) == True:
-                            break
+                while True:
+                    if pygame.event.peek():
+                        break
+                    else:
+                        time.sleep(0.0167)
+                for e in pygame.event.get():
+                    if e.type == pygame.QUIT:
+                        raise StopIteration
+                    if e.type == pygame.MOUSEBUTTONDOWN:
+                        for layer in reversed(self._layers):
+                            if layer.mouse_down(e.pos) == True:
+                                break
+                    if e.type == pygame.MOUSEMOTION:
+                        for layer in reversed(self._layers):
+                            if layer.mouse_move(e.pos) == True:
+                                break
+                    if e.type == pygame.MOUSEBUTTONUP:
+                        for layer in reversed(self._layers):
+                            if layer.mouse_up(e.pos) == True:
+                                break
+
+                    if e.type == pygame.FINGERDOWN:
+                        if self._current_finger_id is None:
+                            self._current_finger_id = e.finger_id
+                            pos = (int(e.x * self._config.win_width), int(e.y * self._config.win_height))
+                            for layer in reversed(self._layers):
+                                if layer.mouse_down(pos) == True:
+                                    break
+                    if e.type == pygame.FINGERMOTION:
+                        if self._current_finger_id is not None:
+                            if e.finger_id == self._current_finger_id:
+                                pos = (int(e.x * self._config.win_width), int(e.y * self._config.win_height))
+                                for layer in reversed(self._layers):
+                                    if layer.mouse_move(pos) == True:
+                                        break
+                    if e.type == pygame.FINGERUP:
+                        if self._current_finger_id is not None:
+                            if e.finger_id == self._current_finger_id:
+                                pos = (int(e.x * self._config.win_width), int(e.y * self._config.win_height))
+                                for layer in reversed(self._layers):
+                                    if layer.mouse_up(pos) == True:
+                                        break
+                                self._current_finger_id = None
+
+                    if e.type == pygame.KEYDOWN:
+                        for layer in reversed(self._layers):
+                            if layer.key_down(e.key) == True:
+                                break
 
                 for layer in self._layers:
                     layer.paint()
